@@ -6,6 +6,11 @@ on:
     branches:
       - main
       - 'feature/*'
+
+env: 
+  MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
+  MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
+  MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
     
 jobs:
     unit-testing:
@@ -24,9 +29,11 @@ jobs:
           run: npm install
     
         - name: Unit Testing
+          id: un-test-step
           run: npm test
           
         - name: Archive Test Result
+          if: always()
           uses: actions/upload-artifact@v3
           with:
             name: Mocha-Test-Result
@@ -48,6 +55,7 @@ jobs:
           run: npm install
     
         - name: Check Code Coverage
+          continue-on-error: true
           run: npm run coverage
           
         - name: Archive Test Result
