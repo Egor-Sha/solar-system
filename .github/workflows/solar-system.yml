@@ -29,7 +29,7 @@ jobs:
           uses: actions/cache@v3
           with:
             path: node-modules
-            key: node-modules-${{ hashfiles('package-lock.json') }}
+            key: node-modules-${{ hashFiles('package-lock.json') }}
     
         - name: Install Dependencies
           run: npm install
@@ -56,6 +56,12 @@ jobs:
           uses: actions/setup-node@v3
           with:
             node-version: 20
+
+        - name: Cache NPM dependencies
+          uses: actions/cache@v3
+          with:
+            path: node-modules
+            key: node-modules-${{ hashFiles('package-lock.json') }}
     
         - name: Install Dependencies
           run: npm install
