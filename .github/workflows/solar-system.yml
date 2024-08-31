@@ -24,6 +24,12 @@ jobs:
           uses: actions/setup-node@v3
           with:
             node-version: 20
+
+        - name: Cache NPM dependencies
+          uses: actions/cache@v4
+          with:
+            path: node-modules
+            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
     
         - name: Install Dependencies
           run: npm install
@@ -50,6 +56,12 @@ jobs:
           uses: actions/setup-node@v3
           with:
             node-version: 20
+
+        - name: Cache NPM dependencies
+          uses: actions/cache@v3
+          with:
+            path: node-modules
+            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
     
         - name: Install Dependencies
           run: npm install
@@ -59,8 +71,34 @@ jobs:
           run: npm run coverage
           
         - name: Archive Test Result
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: Code Cov results
             path: coverage
             retention-days: 2
+
+    docker:
+        name: containerization
+        needs: [unit-testing, code-coverage]
+        runs-on: ubuntu-latest
+        steps:
+        
+        - name: Checkout
+          uses: actions/checkout@v4
+          
+        - name: Login to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ vars.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        - name: Dock Build
+          uses: docker/build-push-docker@v4
+          with: 
+            context: .
+            push: false
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+
+
+
+            
+          
